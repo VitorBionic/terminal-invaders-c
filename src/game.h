@@ -1,0 +1,7 @@
+#ifndef GAME_H
+#define GAME_H
+
+void game_loop(void);
+void game_request_quit(int sig);
+
+#endif

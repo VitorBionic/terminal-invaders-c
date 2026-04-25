@@ -24,7 +24,7 @@ int terminal_init() {
 
     raw = original;
 
-    raw.c_lflag &= ~ECHO;
+    raw.c_lflag &= ~(ECHO | ICANON);
 
     if (tcsetattr(fd, TCSAFLUSH, &raw) == -1) {
         fprintf(stderr, "%s: %s\n", "tcsetattr", strerror(errno));
