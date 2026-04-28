@@ -9,6 +9,7 @@
 
 static int sleep_time(struct timespec start, struct timespec end, struct timespec fr_time, struct timespec *diffp);
 void game_request_quit(int sig);
+static void update(Game *game, Action action, double frame_scale);
 
 static volatile sig_atomic_t stop = 0;
 
@@ -35,7 +36,7 @@ void game_loop() {
             break;
 
         frame_action = input_action(game.game_state);
-        // update(&game, action);
+        update(&game, &action, frane_scale);
         // render(&game)
 
         if (clock_gettime(CLOCK_MONOTONIC, &end_frame) == -1)
@@ -65,4 +66,21 @@ static int sleep_time(struct timespec start, struct timespec end, struct timespe
     }
 
     return 0;
+}
+
+static void update(Game *game, Action action, double frame_scale) {
+    if (action != ACTION_NONE) {
+        switch (game->game_state) {
+            case GAME_STATE_MENU:
+                menu_handle_action(game, action, frame_scale);
+                break;
+        }
+    }
+
+    switch (game->game_state) {
+        case GAME_STATE_MENU:
+            menu_update(game, action, frame_scale);
+            break;
+    }
+
 }
