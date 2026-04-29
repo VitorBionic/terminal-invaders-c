@@ -18,7 +18,15 @@ void menu_handle_action(Game *game, Action *action, double frame_scale) {
             else if (game->menu_selection == MENU_SLCT_QUIT)
                 game->game_state = GAME_STATE_QUIT;
             break;
+        default:
+            break;
     }
 
     *action = ACTION_NONE;
+}
+
+void menu_update(Game *game, Action *action, double frame_scale) {
+    (void)game;
+    (void)action;
+    (void)frame_scale;
 }
