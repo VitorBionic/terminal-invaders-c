@@ -15,7 +15,7 @@ static void update(Game *game, Action *action, double frame_scale);
 
 static volatile sig_atomic_t stop = 0;
 
-// static unsigned int actions_pending[ACTION_COUNT];
+static unsigned int actions_cooldown[ACTION_COUNT];
 
 void game_loop() {
     struct timespec target_frame_time;
@@ -76,7 +76,7 @@ static void update(Game *game, Action *action, double frame_scale) {
     if (*action != ACTION_NONE) {
         switch (game->game_state) {
             case GAME_STATE_MENU:
-                menu_handle_action(game, action, frame_scale);
+                menu_handle_action(game, action, actions_cooldown, frame_scale);
                 break;
             default:
                 break;
@@ -85,7 +85,7 @@ static void update(Game *game, Action *action, double frame_scale) {
 
     switch (game->game_state) {
         case GAME_STATE_MENU:
-            menu_update(game, action, frame_scale);
+            menu_update(game, frame_scale, actions_cooldown);
             break;
         default:
             break;
