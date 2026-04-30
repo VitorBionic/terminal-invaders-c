@@ -8,6 +8,8 @@
 #include "renderer.h"
 
 #define FPS 60
+#define GAME_WIDTH 50
+#define GAME_HEIGHT 20
 
 static int sleep_time(struct timespec start, struct timespec end, struct timespec fr_time, struct timespec *diffp);
 void game_request_quit(int sig);
@@ -27,6 +29,11 @@ void game_loop() {
     game.game_state = GAME_STATE_MENU;
     game.menu_selection = MENU_SLCT_START;
     Action frame_action = ACTION_NONE;
+    game.width = GAME_WIDTH;
+    game.height = GAME_HEIGHT;
+
+    if (!renderer_init(game.width, game.height))
+        game_request_quit(0);
     
     if (fps_to_timespec(FPS, &target_frame_time) == -1)
         game_request_quit(0);
@@ -51,6 +58,9 @@ void game_loop() {
         nanosleep(&diff_frame, NULL);
         
     }
+
+    reset_screen();
+    renderer_destroy();
 }
 
 void game_request_quit(int sig) {

@@ -28,7 +28,8 @@ typedef enum {
 typedef struct {
     GameState game_state;
     MenuSelection menu_selection;
-
+    unsigned int width;
+    unsigned int height;
     unsigned int player_x;
     unsigned int player_y;
 
