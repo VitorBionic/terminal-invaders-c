@@ -22,7 +22,17 @@ Action input_action(GameState gs) {
             default:
                 return ACTION_NONE;
         }
-
+    } else if (gs == GAME_STATE_PLAYING) {
+        switch (c) {
+            case 'a':
+                return ACTION_LEFT;
+            case 'd':
+                return ACTION_RIGHT;
+            case ' ':
+                return ACTION_SHOOT;
+            default:
+                return ACTION_NONE;
+        }
     }
 
     return ACTION_NONE;

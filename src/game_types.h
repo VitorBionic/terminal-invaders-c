@@ -24,14 +24,20 @@ typedef enum {
     MENU_SLCT_QUIT,
 } MenuSelection;
 
+typedef struct {
+    unsigned int x;
+    unsigned int y;
+    unsigned int lives;
+} Player;
 
 typedef struct {
     GameState game_state;
     MenuSelection menu_selection;
+
     unsigned int width;
     unsigned int height;
-    unsigned int player_x;
-    unsigned int player_y;
+
+    Player player;
 
 } Game;
 

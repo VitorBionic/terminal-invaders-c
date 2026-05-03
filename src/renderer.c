@@ -14,6 +14,7 @@
 #define END_ROW "\r\n"
 
 static void build_menu_screen(Game *game);
+static void build_playing_screen(Game *game);
 static void render_screen();
 static int find_center_row(int lines);
 static int find_center_col(int len);
@@ -28,7 +29,6 @@ int renderer_init(int w, int h) {
     if (screen == NULL)
         return 0;
 
-    memset(screen, ' ', (size_t)w * (size_t)h);
     return 1;
 }
 
@@ -37,10 +37,14 @@ void renderer_destroy() {
 }
 
 void render(Game *game) {
+    memset(screen, ' ', (size_t)width * (size_t)height);
     write(STDOUT_FILENO, CURSOR_TO_TOP, sizeof(CURSOR_TO_TOP) - 1);
     switch (game->game_state) {
         case GAME_STATE_MENU:
             build_menu_screen(game);
+            break;
+        case GAME_STATE_PLAYING:
+            build_playing_screen(game);
             break;
         default:
             break;
@@ -58,7 +62,6 @@ void reset_screen() {
 }
 
 static void build_menu_screen(Game *game) {
-    memset(screen, ' ', (size_t)width * (size_t)height);
 
     const char *cp = MENU_TITLE;
     int center_col = find_center_col(sizeof(MENU_TITLE));
@@ -108,6 +111,10 @@ static void build_menu_screen(Game *game) {
         cp++;
     }
         
+}
+
+static void build_playing_screen(Game *game) {
+    screen[IDX(game->player.y, game->player.x)] = 'A';
 }
 
 static int find_center_row(int lines) {
