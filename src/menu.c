@@ -57,6 +57,7 @@ static void change_menu_selection(Game *game, Action action) {
         case ACTION_CONFIRM:
             if (game->menu_selection == MENU_SLCT_START) {
                 game->game_state = GAME_STATE_PLAYING;
+                game->frame_count = 0;
                 game->player.x = 0;
                 game->player.y = game->height - 1;
                 game->player.lives = PLAYER_START_LIVES;

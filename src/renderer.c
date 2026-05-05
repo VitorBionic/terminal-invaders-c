@@ -115,6 +115,11 @@ static void build_menu_screen(Game *game) {
 
 static void build_playing_screen(Game *game) {
     screen[IDX(game->player.y, game->player.x)] = 'A';
+
+    unsigned int i;
+    for (i = 0; i < game->bullet_count; i++)
+        screen[IDX(game->bullets[i].pos_y, game->bullets[i].pos_x)] = '|';
+    
 }
 
 static int find_center_row(int lines) {

@@ -1,6 +1,10 @@
 #ifndef GAME_TYPES_H
 #define GAME_TYPES_H
 
+#include <stddef.h>
+
+#define MAX_BULLETS 10
+
 typedef enum {
     ACTION_UP,
     ACTION_DOWN,
@@ -30,14 +34,29 @@ typedef struct {
     unsigned int lives;
 } Player;
 
+typedef enum {
+    BULLET_UP,
+    BULLET_DOWN
+} BulletDirection;
+
+typedef struct {
+    unsigned int pos_x, pos_y;
+    BulletDirection direction;
+} Bullet;
+
 typedef struct {
     GameState game_state;
     MenuSelection menu_selection;
+
+    size_t frame_count;
 
     unsigned int width;
     unsigned int height;
 
     Player player;
+
+    Bullet bullets[MAX_BULLETS];
+    unsigned int bullet_count;
 
 } Game;
 
