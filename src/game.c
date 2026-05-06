@@ -11,6 +11,11 @@
 #define FPS 60
 #define GAME_WIDTH 50
 #define GAME_HEIGHT 20
+#define PLAYER_START_LIVES 3
+#define ENEMIES_LINES 5
+#define ENEMIES_PER_LINE 11
+#define V_FRONTLINE 0
+#define W_FRONTLINE 2
 
 static int sleep_time(struct timespec start, struct timespec end, struct timespec fr_time, struct timespec *diffp);
 void game_request_quit(int sig);
@@ -67,6 +72,37 @@ void game_loop() {
 void game_request_quit(int sig) {
     (void)sig;
     stop = 1;
+}
+
+void start_game(Game *game) {
+    game->frame_count = 0;
+    game->player.x = 0;
+    game->player.y = game->height - 1;
+    game->player.lives = PLAYER_START_LIVES;
+    game->bullet_count = 0;
+
+    int i, j, cur;
+    cur = 0;
+    for (i = 0; i < ENEMIES_LINES; i++) {
+        for (j = 0; j < ENEMIES_PER_LINE; j++) {
+                Enemy enemy;
+                enemy.x = j + 1;
+                enemy.y = i;
+            if (i <= V_FRONTLINE)
+                enemy.type = ENEMY_TYPE_V;
+            else if (i <= W_FRONTLINE)
+                enemy.type = ENEMY_TYPE_W;
+            else
+                enemy.type = ENEMY_TYPE_M;
+            game->enemies[cur] = enemy;
+            ++cur;
+        }
+    }
+
+    game->enemy_count = cur;
+
+    for (i = 0; i < ACTION_COUNT; i++)
+        actions_cooldown[i] = 0;
 }
 
 static int sleep_time(struct timespec start, struct timespec end, struct timespec fr_time, struct timespec *diffp) {

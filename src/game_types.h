@@ -4,6 +4,7 @@
 #include <stddef.h>
 
 #define MAX_BULLETS 10
+#define MAX_ENEMIES 55
 
 typedef enum {
     ACTION_UP,
@@ -44,6 +45,18 @@ typedef struct {
     BulletDirection direction;
 } Bullet;
 
+typedef enum {
+    ENEMY_TYPE_M,
+    ENEMY_TYPE_W,
+    ENEMY_TYPE_V
+} EnemyType;
+
+typedef struct {
+    unsigned int x;
+    unsigned int y;
+    EnemyType type;
+} Enemy;
+
 typedef struct {
     GameState game_state;
     MenuSelection menu_selection;
@@ -57,6 +70,9 @@ typedef struct {
 
     Bullet bullets[MAX_BULLETS];
     unsigned int bullet_count;
+
+    Enemy enemies[MAX_ENEMIES];
+    unsigned int enemy_count;
 
 } Game;
 

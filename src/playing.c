@@ -2,7 +2,7 @@
 
 #define ACTION_LEFT_CD 3
 #define ACTION_RIGHT_CD 3
-#define ACTION_SHOOT_CD 12
+#define ACTION_SHOOT_CD 16
 
 #define MOVE_BULLET_INTERVAL 4
 

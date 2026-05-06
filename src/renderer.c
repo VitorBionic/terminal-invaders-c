@@ -114,9 +114,31 @@ static void build_menu_screen(Game *game) {
 }
 
 static void build_playing_screen(Game *game) {
+    unsigned int i;
+
     screen[IDX(game->player.y, game->player.x)] = 'A';
 
-    unsigned int i;
+    for (i = 0; i < game->enemy_count; i++) {
+        char enemy;
+        switch (game->enemies[i].type) {
+            case ENEMY_TYPE_V:
+                enemy = 'V';
+                break;
+            case ENEMY_TYPE_W:
+                enemy = 'W';
+                break;
+            case ENEMY_TYPE_M:
+                enemy = 'M';
+                break;
+            default:
+                enemy = 'X';
+                break;
+        }
+
+        screen[IDX(game->enemies[i].y, game->enemies[i].x)] = enemy;
+    }
+    
+
     for (i = 0; i < game->bullet_count; i++)
         screen[IDX(game->bullets[i].pos_y, game->bullets[i].pos_x)] = '|';
     

@@ -1,9 +1,9 @@
 #include "game_types.h"
+#include "game.h"
 
 #define ACTION_UP_CD 8
 #define ACTION_DOWN_CD 8
 #define ACTION_CONFIRM_CD 12
-#define PLAYER_START_LIVES 3
 
 static void change_menu_selection(Game *game, Action action);
 
@@ -57,10 +57,7 @@ static void change_menu_selection(Game *game, Action action) {
         case ACTION_CONFIRM:
             if (game->menu_selection == MENU_SLCT_START) {
                 game->game_state = GAME_STATE_PLAYING;
-                game->frame_count = 0;
-                game->player.x = 0;
-                game->player.y = game->height - 1;
-                game->player.lives = PLAYER_START_LIVES;
+                start_game(game);
             } else if (game->menu_selection == MENU_SLCT_QUIT)
                 game->game_state = GAME_STATE_QUIT;
             break;
