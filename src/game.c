@@ -86,7 +86,7 @@ void start_game(Game *game) {
     for (i = 0; i < ENEMIES_LINES; i++) {
         for (j = 0; j < ENEMIES_PER_LINE; j++) {
                 Enemy enemy;
-                enemy.x = j + 1;
+                enemy.x = j * 2 + 1;
                 enemy.y = i;
             if (i <= V_FRONTLINE)
                 enemy.type = ENEMY_TYPE_V;
@@ -100,6 +100,7 @@ void start_game(Game *game) {
     }
 
     game->enemy_count = cur;
+    game->enemy_direction = ENEMY_DIRECTION_RIGHT;
 
     for (i = 0; i < ACTION_COUNT; i++)
         actions_cooldown[i] = 0;

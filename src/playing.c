@@ -5,10 +5,12 @@
 #define ACTION_SHOOT_CD 16
 
 #define MOVE_BULLET_INTERVAL 4
+#define START_ENEMY_MOVE_INTERVAL 30
 
 static void spawn_bullet(Game *game, unsigned int x, unsigned int y, BulletDirection direction);
 static void despawn_bullet(Game *game, int unsigned index);
 static void move_bullets(Game *game);
+static void move_enemies(Game *game);
 
 void playing_handle_action(Game *game, Action *action, unsigned int actions_cooldown[], double frame_scale) {
     switch (*action) {
@@ -56,6 +58,12 @@ void playing_update(Game *game, double frame_scale, unsigned int actions_cooldow
     if (game->frame_count % interval == 0)
         move_bullets(game);
 
+    interval = START_ENEMY_MOVE_INTERVAL * frame_scale;
+        if (interval == 0)
+            interval = 1;
+    if (game->frame_count % interval == 0)
+        move_enemies(game);
+
 }
 
 static void move_bullets(Game *game) {
@@ -98,4 +106,48 @@ static void despawn_bullet(Game *game, unsigned int index) {
         game->bullets[index] = game->bullets[game->bullet_count - 1];
         game->bullet_count--;
     }
+}
+
+static void move_enemies(Game *game) {
+    if (game->enemy_count == 0)
+        return;
+
+    unsigned int i;
+
+    if (game->enemy_direction == ENEMY_DIRECTION_LEFT) {
+        Enemy most_left_enemy = game->enemies[0];
+        for (i = 1; i < game->enemy_count; i++) {
+            if (game->enemies[i].x < most_left_enemy.x) 
+                most_left_enemy = game->enemies[i];
+        }
+
+        if (most_left_enemy.x <= 1) {
+            for (i = 0; i < game->enemy_count; i++) {
+                if (game->enemies[i].y < game->height - 1)
+                    game->enemies[i].y++;
+            }
+            game->enemy_direction = ENEMY_DIRECTION_RIGHT;
+        } else {
+            for (i = 0; i < game->enemy_count; i++)
+                game->enemies[i].x--;
+        }
+    } else if (game->enemy_direction == ENEMY_DIRECTION_RIGHT) {
+        Enemy most_right_enemy = game->enemies[0];
+        for (i = 1; i < game->enemy_count; i++) {
+            if (game->enemies[i].x > most_right_enemy.x) 
+                most_right_enemy = game->enemies[i];
+        }
+
+        if (most_right_enemy.x >= game->width - 1) {
+            for (i = 0; i < game->enemy_count; i++) {
+                if (game->enemies[i].y < game->height - 1)
+                    game->enemies[i].y++;
+            }
+            game->enemy_direction = ENEMY_DIRECTION_LEFT;
+        } else {
+            for (i = 0; i < game->enemy_count; i++)
+                game->enemies[i].x++;
+        }
+    }
+
 }

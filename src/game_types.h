@@ -57,6 +57,11 @@ typedef struct {
     EnemyType type;
 } Enemy;
 
+typedef enum {
+    ENEMY_DIRECTION_LEFT,
+    ENEMY_DIRECTION_RIGHT
+} EnemyDirection;
+
 typedef struct {
     GameState game_state;
     MenuSelection menu_selection;
@@ -73,6 +78,8 @@ typedef struct {
 
     Enemy enemies[MAX_ENEMIES];
     unsigned int enemy_count;
+
+    EnemyDirection enemy_direction;
 
 } Game;
 
