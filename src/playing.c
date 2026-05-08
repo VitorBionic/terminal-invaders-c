@@ -1,4 +1,5 @@
 #include "game_types.h"
+#include "game.h"
 
 #define ACTION_LEFT_CD 3
 #define ACTION_RIGHT_CD 3
@@ -11,6 +12,9 @@ static void spawn_bullet(Game *game, unsigned int x, unsigned int y, BulletDirec
 static void despawn_bullet(Game *game, int unsigned index);
 static void move_bullets(Game *game);
 static void move_enemies(Game *game);
+static void despawn_enemy(Game *game, unsigned int index);
+static void handle_bullet_collisions(Game *game);
+static void check_game_over(Game *game);
 
 void playing_handle_action(Game *game, Action *action, unsigned int actions_cooldown[], double frame_scale) {
     switch (*action) {
@@ -64,6 +68,17 @@ void playing_update(Game *game, double frame_scale, unsigned int actions_cooldow
     if (game->frame_count % interval == 0)
         move_enemies(game);
 
+    handle_bullet_collisions(game);
+
+    check_game_over(game);
+
+}
+
+static void check_game_over(Game *game) {
+    if (game->player.lives == 0)
+        game->game_state = GAME_STATE_GAME_OVER;
+    else if (game->enemy_count == 0)
+        start_game(game);
 }
 
 static void move_bullets(Game *game) {
@@ -108,6 +123,13 @@ static void despawn_bullet(Game *game, unsigned int index) {
     }
 }
 
+static void despawn_enemy(Game *game, unsigned int index) {
+    if (game->enemy_count > 0 && index < game->enemy_count) {
+        game->enemies[index] = game->enemies[game->enemy_count - 1];
+        game->enemy_count--;
+    }
+}
+
 static void move_enemies(Game *game) {
     if (game->enemy_count == 0)
         return;
@@ -123,8 +145,11 @@ static void move_enemies(Game *game) {
 
         if (most_left_enemy.x <= 1) {
             for (i = 0; i < game->enemy_count; i++) {
-                if (game->enemies[i].y < game->height - 1)
+                if (game->enemies[i].y < game->height - 1) {
                     game->enemies[i].y++;
+                    if (game->enemies[i].y == game->player.y)
+                        game->player.lives = 0;
+                }
             }
             game->enemy_direction = ENEMY_DIRECTION_RIGHT;
         } else {
@@ -140,8 +165,11 @@ static void move_enemies(Game *game) {
 
         if (most_right_enemy.x >= game->width - 1) {
             for (i = 0; i < game->enemy_count; i++) {
-                if (game->enemies[i].y < game->height - 1)
+                if (game->enemies[i].y < game->height - 1) {
                     game->enemies[i].y++;
+                    if (game->enemies[i].y == game->player.y)
+                        game->player.lives = 0;
+                }
             }
             game->enemy_direction = ENEMY_DIRECTION_LEFT;
         } else {
@@ -150,4 +178,35 @@ static void move_enemies(Game *game) {
         }
     }
 
+}
+
+static void handle_bullet_collisions(Game *game) {
+    unsigned int i, j, collision;
+    
+    i = 0;
+    while (i < game->bullet_count) {
+        if (game->bullets[i].direction == BULLET_UP) {
+            collision = 0;
+            j = 0;
+            while (j < game->enemy_count) {
+                if (game->bullets[i].pos_x == game->enemies[j].x && game->bullets[i].pos_y == game->enemies[j].y) {
+                    despawn_bullet(game, i);
+                    despawn_enemy(game, j);
+                    collision = 1;
+                    break;
+                }
+                j++;
+            }
+
+            if (!collision)
+                i++;
+        } else if (game->bullets[i].direction == BULLET_DOWN) {
+            if (game->bullets[i].pos_x == game->player.x && game->bullets[i].pos_y == game->player.y) {
+                if (game->player.lives > 0)
+                    game->player.lives--;
+                despawn_bullet(game, i);
+            } else
+                i++;
+        }
+    }
 }
