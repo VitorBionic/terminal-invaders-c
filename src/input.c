@@ -33,6 +33,13 @@ Action input_action(GameState gs) {
             default:
                 return ACTION_NONE;
         }
+    } else if (gs == GAME_STATE_GAME_OVER) {
+        switch (c) {
+            case ' ':
+                return ACTION_CONFIRM;
+            default:
+                return ACTION_NONE;
+        }
     }
 
     return ACTION_NONE;

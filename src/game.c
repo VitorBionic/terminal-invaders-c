@@ -6,6 +6,7 @@
 #include "game_types.h"
 #include "menu.h"
 #include "playing.h"
+#include "gameover.h"
 #include "renderer.h"
 
 #define FPS 60
@@ -129,6 +130,9 @@ static void update(Game *game, Action *action, double frame_scale) {
             case GAME_STATE_PLAYING:
                 playing_handle_action(game, action, actions_cooldown, frame_scale);
                 break;
+            case GAME_STATE_GAME_OVER:
+                gameover_handle_action(game, action, actions_cooldown, frame_scale);
+                break;
             default:
                 break;
         }
@@ -140,6 +144,9 @@ static void update(Game *game, Action *action, double frame_scale) {
             break;
         case GAME_STATE_PLAYING:
             playing_update(game, frame_scale, actions_cooldown);
+            break;
+        case GAME_STATE_GAME_OVER:
+            gameover_update(game, frame_scale, actions_cooldown);
             break;
         default:
             break;

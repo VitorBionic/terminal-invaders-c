@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include "game_types.h"
@@ -11,10 +12,13 @@
 #define MENU_TITLE "TERMINAL INVADERS"
 #define MENU_START "START"
 #define MENU_QUIT "QUIT"
+#define PLAYING_LIVES "LIVES: "
+#define GAME_OVER "GAME OVER"
 #define END_ROW "\r\n"
 
 static void build_menu_screen(Game *game);
 static void build_playing_screen(Game *game);
+static void build_gameover_screen(Game *game);
 static void render_screen();
 static int find_center_row(int lines);
 static int find_center_col(int len);
@@ -24,8 +28,8 @@ static int width, height;
 
 int renderer_init(int w, int h) {
     width = w;
-    height = h;
-    screen = malloc((size_t)w * (size_t)h);
+    height = h + 1;
+    screen = malloc((size_t)width * (size_t)height);
     if (screen == NULL)
         return 0;
 
@@ -45,6 +49,9 @@ void render(Game *game) {
             break;
         case GAME_STATE_PLAYING:
             build_playing_screen(game);
+            break;
+        case GAME_STATE_GAME_OVER:
+            build_gameover_screen(game);
             break;
         default:
             break;
@@ -141,7 +148,42 @@ static void build_playing_screen(Game *game) {
 
     for (i = 0; i < game->bullet_count; i++)
         screen[IDX(game->bullets[i].pos_y, game->bullets[i].pos_x)] = '|';
+
+    i = 0;
+    const char *cp = PLAYING_LIVES;
+
+    while (*cp) {
+        screen[IDX(height - 1, i++)] = *cp;
+        cp++;
+    }
+
+    char buffer[3];
+    snprintf(buffer, 3, "%d", game->player.lives);
+
+    cp = buffer;
+
+    while (*cp) {
+        screen[IDX(height - 1, i++)] = *cp;
+        cp++;
+    }
     
+}
+
+static void build_gameover_screen(Game *game) {
+
+    const char *cp = GAME_OVER;
+    int center_col = find_center_col(sizeof(GAME_OVER));
+    int center_row = find_center_row(1);
+
+    if (center_row == -1 || center_col == -1)
+        return;
+
+    while (*cp) {
+        screen[IDX(center_row, center_col++)] = *cp;
+        cp++;
+    }
+        
+    (void)game;
 }
 
 static int find_center_row(int lines) {
