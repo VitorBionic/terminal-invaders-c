@@ -6,8 +6,8 @@
 #define ACTION_SHOOT_CD 30
 
 #define MOVE_BULLET_INTERVAL 4
-#define START_ENEMY_MOVE_INTERVAL 30
 
+static void speed_up(Game *game);
 static void spawn_bullet(Game *game, unsigned int x, unsigned int y, BulletDirection direction);
 static void despawn_bullet(Game *game, int unsigned index);
 static void move_bullets(Game *game);
@@ -62,7 +62,7 @@ void playing_update(Game *game, double frame_scale, unsigned int actions_cooldow
     if (game->frame_count % interval == 0)
         move_bullets(game);
 
-    interval = START_ENEMY_MOVE_INTERVAL * frame_scale;
+    interval = game->enemy_move_interval * frame_scale;
         if (interval == 0)
             interval = 1;
     if (game->frame_count % interval == 0)
@@ -193,6 +193,7 @@ static void handle_bullet_collisions(Game *game) {
                     despawn_bullet(game, i);
                     despawn_enemy(game, j);
                     collision = 1;
+                    speed_up(game);
                     break;
                 }
                 j++;
@@ -202,11 +203,26 @@ static void handle_bullet_collisions(Game *game) {
                 i++;
         } else if (game->bullets[i].direction == BULLET_DOWN) {
             if (game->bullets[i].pos_x == game->player.x && game->bullets[i].pos_y == game->player.y) {
-                if (game->player.lives > 0)
+                if (game->player.lives > 0) {
                     game->player.lives--;
+                    game->player.x = 0;
+                }
                 despawn_bullet(game, i);
             } else
                 i++;
         }
     }
+}
+
+static void speed_up(Game *game) {
+    if (game->enemy_count == 39)
+        game->enemy_move_interval = 24;
+    else if (game->enemy_count == 29)
+        game->enemy_move_interval = 18;
+    else if (game->enemy_count == 19)
+        game->enemy_move_interval = 12;
+    else if (game->enemy_count == 9)
+        game->enemy_move_interval = 8;
+    else if (game->enemy_count == 4)
+        game->enemy_move_interval = 5;
 }

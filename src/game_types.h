@@ -80,6 +80,7 @@ typedef struct {
     unsigned int enemy_count;
 
     EnemyDirection enemy_direction;
+    unsigned int enemy_move_interval;
 
 } Game;
 

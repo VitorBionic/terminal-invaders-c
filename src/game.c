@@ -17,6 +17,7 @@
 #define ENEMIES_PER_LINE 11
 #define V_FRONTLINE 0
 #define W_FRONTLINE 2
+#define START_ENEMY_MOVE_INTERVAL 30
 
 static int sleep_time(struct timespec start, struct timespec end, struct timespec fr_time, struct timespec *diffp);
 void game_request_quit(int sig);
@@ -105,6 +106,8 @@ void start_game(Game *game) {
 
     for (i = 0; i < ACTION_COUNT; i++)
         actions_cooldown[i] = 0;
+
+    game->enemy_move_interval = START_ENEMY_MOVE_INTERVAL;
 }
 
 static int sleep_time(struct timespec start, struct timespec end, struct timespec fr_time, struct timespec *diffp) {
