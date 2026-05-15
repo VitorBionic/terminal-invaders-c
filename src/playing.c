@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "game_types.h"
 #include "game.h"
 
@@ -6,12 +7,14 @@
 #define ACTION_SHOOT_CD 30
 
 #define MOVE_BULLET_INTERVAL 4
+#define ENEMY_SHOOT_INTERVAL 45
 
 static void speed_up(Game *game);
 static void spawn_bullet(Game *game, unsigned int x, unsigned int y, BulletDirection direction);
 static void despawn_bullet(Game *game, int unsigned index);
 static void move_bullets(Game *game);
 static void move_enemies(Game *game);
+static void enemy_shoot(Game *game);
 static void despawn_enemy(Game *game, unsigned int index);
 static void handle_bullet_collisions(Game *game);
 static void check_game_over(Game *game);
@@ -67,6 +70,12 @@ void playing_update(Game *game, double frame_scale, unsigned int actions_cooldow
             interval = 1;
     if (game->frame_count % interval == 0)
         move_enemies(game);
+
+    interval = ENEMY_SHOOT_INTERVAL * frame_scale;
+        if (interval == 0)
+            interval = 1;
+    if (game->frame_count % interval == 0)
+        enemy_shoot(game);
 
     handle_bullet_collisions(game);
 
@@ -225,4 +234,54 @@ static void speed_up(Game *game) {
         game->enemy_move_interval = 8;
     else if (game->enemy_count == 4)
         game->enemy_move_interval = 5;
+}
+
+static void enemy_shoot(Game *game) {
+
+    if (game->enemy_count == 0)
+        return;
+
+    int *front_enemies_indices = malloc(sizeof(int) * game->width);
+    if (front_enemies_indices == NULL)
+        return;
+
+    unsigned int i, j;
+
+    for (i = 0; i < game->width; i++) {
+        int front_enemyi = -1;
+        for (j = 0; j < game->enemy_count; j++) {
+            if (game->enemies[j].x == i) {
+                if (front_enemyi == -1)
+                    front_enemyi = j;
+                else {
+                    if (game->enemies[j].y > game->enemies[front_enemyi].y)
+                        front_enemyi = j;
+                }
+            }
+        }
+        front_enemies_indices[i] = front_enemyi;
+    }
+
+    int rand_num = rand() % (int)game->width;
+    int cur_rand_index = rand_num;
+
+    while (rand_num) {
+        if (cur_rand_index < (int)game->width - 1)
+            cur_rand_index++;
+        else
+            cur_rand_index = 0;
+
+        while (front_enemies_indices[cur_rand_index] == -1) {
+            if (cur_rand_index < (int)game->width - 1)
+                cur_rand_index++;
+            else
+                cur_rand_index = 0;
+        }
+        rand_num--;
+    }
+
+    if (front_enemies_indices[cur_rand_index] != -1 && game->enemies[front_enemies_indices[cur_rand_index]].y < game->height - 1)
+        spawn_bullet(game, game->enemies[front_enemies_indices[cur_rand_index]].x, game->enemies[front_enemies_indices[cur_rand_index]].y + 1, BULLET_DOWN);
+    
+    free(front_enemies_indices);
 }
